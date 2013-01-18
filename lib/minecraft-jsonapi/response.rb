@@ -8,7 +8,7 @@ module Minecraft
 				if data["result"].nil?
 					@result = data.map { |r| r["result"] }
 					@source = data.map { |r| r["source"] }
-					@response = data.map { |r| r["response"] }
+					@response = data.map { |r| r["success"] }
 				else
 					@result = data["result"]
 					@source = data["source"]
