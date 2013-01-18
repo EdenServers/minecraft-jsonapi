@@ -6,20 +6,19 @@ module Minecraft
 				@namespace = namespace
 			end
 
-			def namespace
-				[parent.namespace, @namespace].reject {|x| x.nil? }.join(".")
-			end
-
 			def method_missing(method, *args)
-				method = [namespace, method.to_s].join(".")
-				url = parent.make_url(method, args)
+				method = [@namespace, method.to_s].join(".")
+				url = @parent.make_url(method, args)
+
+				puts "Method: %s" % method
+				puts "URL: %s" % url
 
 				Minecraft::JSONAPI.send_request(url)
 			end
 
 			# This will bubble upwards until we hit the actual JSONAPI class
 			def make_url(*args)
-				parent.make_url(*args)
+				@parent.make_url(*args)
 			end
 		end
 	end
