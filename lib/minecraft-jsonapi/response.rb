@@ -2,7 +2,9 @@ module Minecraft
 	module JSONAPI
 		class Response
 			def initialize(data)
+				puts data
 				data = JSON.parse data
+				puts data
 
 				# Was this a multi-call?
 				if data["result"].nil?
