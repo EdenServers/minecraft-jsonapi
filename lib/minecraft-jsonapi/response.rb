@@ -2,15 +2,15 @@ module Minecraft
 	module JSONAPI
 		class Response
 			def initialize(data)
-				puts data
 				data = JSON.parse data
-				puts data
 
 				# Was this a multi-call?
 				if data["result"].nil?
 					@result = data.map { |r| r["result"] }
 					@source = data.map { |r| r["source"] }
-					@response = data.map { |r| r["success"] }
+
+					# This is weird. Duplicates the above information in data["success"]
+					@response = data["success"].map { |r| r["success"] }
 				else
 					@result = data["result"]
 					@source = data["source"]
