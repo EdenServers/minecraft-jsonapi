@@ -2,8 +2,12 @@ require 'test/unit'
 require 'minecraft-jsonapi'
 
 class MinecraftJSONAPITest < Test::Unit::TestCase
+	def api
+		@api ||= Minecraft::JSONAPI.new(username: "admin", password: "12345", salt: "mmm")
+	end
+
 	def test_create_new_shortcut
-		assert_equal Minecraft::JSONAPI::JSONAPI, Minecraft::JSONAPI.new(username: "admin", password: "12345", salt: "mmm").class
+		assert_equal Minecraft::JSONAPI::JSONAPI, api.class
 	end
 
 	def test_map_to_array
@@ -23,5 +27,9 @@ class MinecraftJSONAPITest < Test::Unit::TestCase
 	def test_url_encoded_json
 		assert_equal "%5B%22test%22%5D", Minecraft::JSONAPI.url_encoded_json(["test"])
 		assert_equal "%5B%22test%22%2C5%5D", Minecraft::JSONAPI.url_encoded_json(["test", 5])
+	end
+
+	def test_connection
+		assert_equal 0, api.getPlayerCount
 	end
 end
