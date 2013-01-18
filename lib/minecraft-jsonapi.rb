@@ -2,6 +2,7 @@ require 'minecraft-jsonapi/version'
 require 'json'
 require 'digest/sha2'
 require 'net/http'
+require 'cgi'
 
 module Minecraft
 	module JSONAPI
@@ -23,9 +24,9 @@ module Minecraft
 
 			def make_url(method, args)
 				if method.is_a? Array
-					Minecraft::JSONAPI::CALL_MULTIPLE_URL % { host: @host, port: @port, method: Minecraft::JSONAPI.url_encoded_json method, args: Minecraft::JSONAPI.url_encoded_json args, key: create_key method }
+					Minecraft::JSONAPI::CALL_MULTIPLE_URL % { host: @host, port: @port, method: Minecraft::JSONAPI.url_encoded_json(method), args: Minecraft::JSONAPI.url_encoded_json(args), key: create_key(method) }
 				else
-					Minecraft::JSONAPI::CALL_URL          % { host: @host, port: @port, method: Minecraft::JSONAPI.url_encoded_json method, args: Minecraft::JSONAPI.url_encoded_json args, key: create_key method }
+					Minecraft::JSONAPI::CALL_URL          % { host: @host, port: @port, method: Minecraft::JSONAPI.url_encoded_json(method), args: Minecraft::JSONAPI.url_encoded_json(args), key: create_key(method) }
 				end
 			end
 
@@ -104,7 +105,7 @@ module Minecraft
 		def self.map_to_array(arguments)
 			if arguments.nil?
 				[]
-			elsif arguments.is_a? Array || arguments.is_a? Hash
+			elsif arguments.is_a?(Array) || arguments.is_a?(Hash)
 				arguments
 			else
 				[arguments]
@@ -112,7 +113,7 @@ module Minecraft
 		end
 
 		def self.url_encoded_json(data)
-			CGI.escape JSON.generate data
+			::CGI.escape JSON.generate data
 		end
 	end
 end
