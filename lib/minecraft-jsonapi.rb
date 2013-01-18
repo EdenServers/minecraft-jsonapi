@@ -5,49 +5,114 @@ require 'net/http'
 
 module Minecraft
 	module JSONAPI
-		CALL_URL = 'http://%s:%s/api/call?method=%s&args=%s&key=%s'
-		CALL_MULTIPLE_URL = 'http://%s:%s/api/call-multiple?method=%s&args=%s&key=%s'
+		CALL_URL          = 'http://%{host}:%{port}/api/call?method=%{method}&args=%{args}&key=%{key}'
+		CALL_MULTIPLE_URL = 'http://%{host}:%{port}/api/call-multiple?method=%{method}&args=%{args}&key=%{key}'
 
-		def initialize(options = {})
-			@host = options[:host] || 'localhost'
-			@port = options[:port] || 20059
-			@username = options[:username]
-			@password = options[:password]
-			@salt = options[:salt]
-		end
+		class JSONAPI
+			def initialize(options = {})
+				raise "A username must be provided." if options[:username].nil?
+				raise "A password must be provided." if options[:password].nil?
+				raise "Please use a salt."           if options[:salt].nil?
 
-		def create_key(method)
-			method = JSON.generate(method) if method.is_a? Array
+				@host     = options[:host]     || 'localhost'
+				@port     = options[:port]     || 20059
+				@username = options[:username]
+				@password = options[:password]
+				@salt     = options[:salt]
+			end
 
-			Digest::SHA2.new.update([@username, method, @password, @salt].join).to_s
-		end
+			def make_url(method, args)
+				if method.is_a? Array
+					Minecraft::JSONAPI::CALL_MULTIPLE_URL % { host: @host, port: @port, method: Minecraft::JSONAPI.url_encoded_json method, args: Minecraft::JSONAPI.url_encoded_json args, key: create_key method }
+				else
+					Minecraft::JSONAPI::CALL_URL          % { host: @host, port: @port, method: Minecraft::JSONAPI.url_encoded_json method, args: Minecraft::JSONAPI.url_encoded_json args, key: create_key method }
+				end
+			end
 
-		def make_url(method, args = {})
-			if method.is_a? Array
-				CALL_MULTIPLE_URL.sprintf @host, @port, CGI.escape(method), CGI.escape(JSON.generate(args)), create_key(method)
-			else
-				CALL_URL.sprintf @host, @port, CGI.escape(JSON.generate(method)), CGI.escape(JSON.generate(args)), create_key(method)
+			def call(methods)
+				method_names = methods.keys.map(&:to_s)
+				method_arguments = methods.values.map { |args| Minecraft::JSONAPI.map_to_array args }
+
+				url = Minecraft::JSONAPI.make_url(method_names, method_arguments)
+				JSON.parse Minecraft::JSONAPI.send_raw_request(url)
+			end
+
+			def method_missing(method, *args, &block)
+				if block_given?
+					block.call Minecraft::JSONAPI::Namespace.new(self, method)
+				else
+					url = Minecraft::JSONAPI.make_url(method, args)
+					JSON.parse Minecraft::JSONAPI.send_raw_request(url)
+				end
+			end
+
+			def create_key(method)
+				method = JSON.generate(method) if method.is_a? Array
+
+				Digest::SHA2.new.update([@username, method, @password, @salt].join).to_s
+			end
+
+			def namespace
 			end
 		end
 
-		def call_multiple(methods, args)
+		class Namespace
+			def initialize(parent, namespace)
+				@parent = parent
+				@namespace = namespace
+			end
+
+			def namespace
+				[parent.namespace, @namespace].reject {|x| x.nil? }.join(".")
+			end
+
+			def method_missing(method, *args, &block)
+				if block_given?
+					block.call Minecraft::JSONAPI::Namespace.new(self, method)
+				else
+					method = [namespace, method].join(".")
+					url = parent.make_url(method, args)
+
+					JSON.parse Minecraft::JSONAPI.send_raw_request(url)
+				end
+			end
+
+			# This will bubble upwards until we hit the actual JSONAPI class
+			def make_url(*args)
+				parent.make_url(*args)
+			end
 		end
 
-		def method_missing(method, *args)
-			JSON.parse send_raw_request(make_url(method, args))
+		# Shortcut to Minecraft::JSONAPI::JSONAPI.new
+		def self.new(options = {})
+			Minecraft::JSONAPI::JSONAPI.new options
 		end
 
-		private
-
-		def send_raw_request(url)
+		def self.send_raw_request(url)
 			uri = URI.parse(url)
 
 			http = Net::HTTP.new(uri.host, uri.port)
 			http.open_timeout = 10
 			http.read_timeout = 10
-			request = http.request(Net::HTTP::Get.new(uri.request_uri))
+			response = http.request(Net::HTTP::Get.new(uri.request_uri))
 
-			request.body
+			response.body
+		end
+
+		# Map all arguments into an array if they're not already an array or hash
+		# Converts nil to [], "" to [""], "Username" to ["Username"], etc.
+		def self.map_to_array(arguments)
+			if arguments.nil?
+				[]
+			elsif arguments.is_a? Array || arguments.is_a? Hash
+				arguments
+			else
+				[arguments]
+			end
+		end
+
+		def self.url_encoded_json(data)
+			CGI.escape JSON.generate data
 		end
 	end
 end
