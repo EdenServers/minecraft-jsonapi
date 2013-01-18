@@ -18,7 +18,25 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+api = Minecraft::JSONAPI.new(host: "123.45.6.78", port: 20059, username: "admin", password: "12345", salt: "makestheworldtastebetter")
+
+api.sendMessage "Dinnerbone", "Hello, Dinnerbone!"
+
+api.permissions do |perms|
+	perms.addPlayerToGroup "Fustrate", "Jolly Good Fellows"
+	groups = perms.getGroups
+end
+
+percent_disk_usage = api.system do |system|
+	system.getDiskUsage / system.getDiskSize
+end
+
+players_online = api.getPlayerCount
+players_limit = api.getPlayerLimit
+api.banWithReason "Nardageddon", "For excessive use of jungle planks."
+api.reloadServer
+```
 
 ## Contributing
 
