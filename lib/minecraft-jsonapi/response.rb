@@ -4,9 +4,16 @@ module Minecraft
 			def initialize(data)
 				data = JSON.parse data
 
-				@result = data["result"]
-				@source = data["source"]
-				@response = data["success"]
+				# Was this a multi-call?
+				if data["result"].nil?
+					@result = data.map { |r| r["result"] }
+					@source = data.map { |r| r["source"] }
+					@response = data.map { |r| r["response"] }
+				else
+					@result = data["result"]
+					@source = data["source"]
+					@response = data["success"]
+				end
 			end
 
 			def result
