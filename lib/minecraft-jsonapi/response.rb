@@ -5,15 +5,13 @@ module Minecraft
 				data = JSON.parse data
 
 				# Was this a multi-call?
-				if data["result"].nil?
-					@result = data.map { |r| r["result"] }
-					@source = data.map { |r| r["source"] }
-
-					# This is weird. Duplicates the above information in data["success"]
+				if data["source"].is_a? Array
+					@result =   data["success"].map { |r| r["result"] }
+					@source =   data["success"].map { |r| r["source"] }
 					@response = data["success"].map { |r| r["success"] }
 				else
-					@result = data["result"]
-					@source = data["source"]
+					@result =   data["result"]
+					@source =   data["source"]
 					@response = data["success"]
 				end
 			end
