@@ -10,9 +10,6 @@ module Minecraft
 				method = [@namespace, method.to_s].join(".")
 				url = @parent.make_url(method, args)
 
-				puts "Method: %s" % method
-				puts "URL: %s" % url
-
 				Minecraft::JSONAPI.send_request(url)
 			end
 

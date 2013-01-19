@@ -1,6 +1,6 @@
 # Minecraft::JSONAPI
 
-TODO: Write a gem description
+A simple Ruby gem to interact with a Minecraft server running [the JSONAPI mod](https://github.com/alecgorge/jsonapi)
 
 ## Installation
 
@@ -19,14 +19,25 @@ Or install it yourself as:
 ## Usage
 
 ```ruby
-api = Minecraft::JSONAPI.new(host: "123.45.6.78", port: 20059, username: "admin", password: "12345", salt: "makestheworldtastebetter")
+require 'minecraft-jsonapi'
+
+api = Minecraft::JSONAPI.new(host: "123.45.6.78", port: 20059, username: "admin", password: "12345", salt: "mmm")
 
 api.sendMessage "Dinnerbone", "Hello, Dinnerbone!"
 
+# Namespaced commands can be sent via blocks...
 api.permissions do |perms|
 	perms.addPlayerToGroup "Fustrate", "Jolly Good Fellows"
 	groups = perms.getGroups
 end
+
+# or Ruby's built-in "send" method
+files = api.send("fs.listDirectory", ".")
+
+# which is equivalent to
+#   files = api.call(:"fs.listDirectory" => ".")[0]
+# and
+#   files = api.fs { |fs| fs.listDirectory "." }
 
 percent_disk_usage = api.system do |system|
 	system.getDiskUsage / system.getDiskSize
