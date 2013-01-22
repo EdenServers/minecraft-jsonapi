@@ -23,9 +23,10 @@ require 'minecraft-jsonapi'
 
 api = Minecraft::JSONAPI.new(host: "123.45.6.78", port: 20059, username: "admin", password: "12345", salt: "mmm")
 
+# The common (non-namespaced) commands are sent as regular Ruby methods with optional parameters:
 api.sendMessage "Dinnerbone", "Hello, Dinnerbone!"
 
-# Namespaced commands can be sent via blocks...
+# Namespaced commands can be sent via blocks:
 api.permissions do |perms|
 	perms.addPlayerToGroup "Fustrate", "Jolly Good Fellows"
 	groups = perms.getGroups
