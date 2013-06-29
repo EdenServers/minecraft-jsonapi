@@ -47,9 +47,9 @@ module Minecraft
 
 		def self.url_encoded_json(data)
 			begin
-				CGI.escape JSON.generate data
+				URI.escape JSON.generate data
 			rescue JSON::GeneratorError
-				CGI.escape data
+				URI.escape data
 			end
 		end
 	end
