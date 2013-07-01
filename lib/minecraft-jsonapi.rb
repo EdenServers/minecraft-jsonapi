@@ -1,12 +1,11 @@
-require 'minecraft-jsonapi/version'
-require 'minecraft-jsonapi/namespace'
-require 'minecraft-jsonapi/jsonapi'
-require 'minecraft-jsonapi/response'
-
 require 'json'
 require 'digest/sha2'
 require 'net/http'
 require 'cgi'
+
+%w{version jsonapi namespace response}.each do |file|
+	require "minecraft-jsonapi/#{file}"
+end
 
 module Minecraft
 	module JSONAPI
