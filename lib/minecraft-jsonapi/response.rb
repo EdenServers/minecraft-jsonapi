@@ -1,6 +1,8 @@
 module Minecraft
 	module JSONAPI
 		class Response
+			attr_reader :result, :source, :response
+
 			def initialize(data)
 				data = JSON.parse data
 
@@ -14,18 +16,6 @@ module Minecraft
 					@source =   data["source"]
 					@response = data["success"]
 				end
-			end
-
-			def result
-				@result
-			end
-
-			def source
-				@source
-			end
-
-			def response
-				@response
 			end
 		end
 	end

@@ -1,6 +1,8 @@
 module Minecraft
 	module JSONAPI
 		class JSONAPI
+			attr_reader :host, :port, :username, :salt
+
 			def initialize(options = {})
 				raise "A username must be provided." if options[:username].nil?
 				raise "A password must be provided." if options[:password].nil?
