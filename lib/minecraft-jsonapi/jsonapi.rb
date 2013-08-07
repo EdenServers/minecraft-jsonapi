@@ -1,4 +1,4 @@
-module Minecraft
+module MinecraftServer
 	module JSONAPI
 		class JSONAPI
 			attr_reader :host, :port, :username, :salt
@@ -17,26 +17,26 @@ module Minecraft
 
 			def make_url(method, args)
 				if method.is_a? Array
-					Minecraft::JSONAPI::CALL_MULTIPLE_URL % { host: @host, port: @port, method: Minecraft::JSONAPI.url_encoded_json(method), args: Minecraft::JSONAPI.url_encoded_json(args), key: create_key(method) }
+					MinecraftServer::JSONAPI::CALL_MULTIPLE_URL % { host: @host, port: @port, method: MinecraftServer::JSONAPI.url_encoded_json(method), args: MinecraftServer::JSONAPI.url_encoded_json(args), key: create_key(method) }
 				else
-					Minecraft::JSONAPI::CALL_URL          % { host: @host, port: @port, method: Minecraft::JSONAPI.url_encoded_json(method), args: Minecraft::JSONAPI.url_encoded_json(args), key: create_key(method) }
+					MinecraftServer::JSONAPI::CALL_URL          % { host: @host, port: @port, method: MinecraftServer::JSONAPI.url_encoded_json(method), args: MinecraftServer::JSONAPI.url_encoded_json(args), key: create_key(method) }
 				end
 			end
 
 			def call(methods)
 				method_names = methods.keys.map(&:to_s)
-				method_arguments = methods.values.map { |args| Minecraft::JSONAPI.map_to_array args }
+				method_arguments = methods.values.map { |args| MinecraftServer::JSONAPI.map_to_array args }
 
 				url = make_url(method_names, method_arguments)
-				Minecraft::JSONAPI.send_request(url)
+				MinecraftServer::JSONAPI.send_request(url)
 			end
 
 			def method_missing(method, *args, &block)
 				if block_given?
-					block.call Minecraft::JSONAPI::Namespace.new(self, method.to_s)
+					block.call MinecraftServer::JSONAPI::Namespace.new(self, method.to_s)
 				else
 					url = make_url(method.to_s, args)
-					Minecraft::JSONAPI.send_request(url)
+					MinecraftServer::JSONAPI.send_request(url)
 				end
 			end
 
