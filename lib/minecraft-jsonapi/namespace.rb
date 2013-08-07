@@ -1,4 +1,4 @@
-module Minecraft
+module MinecraftServer
 	module JSONAPI
 		class Namespace
 			def initialize(parent, namespace)
