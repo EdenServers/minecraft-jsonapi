@@ -7,7 +7,7 @@ require 'cgi'
 	require "minecraft-jsonapi/#{file}"
 end
 
-module Minecraft
+module MinecraftServer
 	module JSONAPI
 		CALL_URL          = 'http://%{host}:%{port}/api/call?method=%{method}&args=%{args}&key=%{key}'
 		CALL_MULTIPLE_URL = 'http://%{host}:%{port}/api/call-multiple?method=%{method}&args=%{args}&key=%{key}'
