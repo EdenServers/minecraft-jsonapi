@@ -1,4 +1,4 @@
-module Minecraft
+module MinecraftServer
 	module JSONAPI
 		class Response
 			attr_reader :result, :source, :response
