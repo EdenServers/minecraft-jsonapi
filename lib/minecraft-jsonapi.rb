@@ -14,7 +14,7 @@ module MinecraftServer
 
 		# Shortcut to Minecraft::JSONAPI::JSONAPI.new
 		def self.new(options = {})
-			Minecraft::JSONAPI::JSONAPI.new options
+			MinecraftServer::JSONAPI::JSONAPI.new options
 		end
 
 		def self.send_request(url)
@@ -29,7 +29,7 @@ module MinecraftServer
 			http.read_timeout = 10
 			response = http.request(Net::HTTP::Get.new(uri.request_uri))
 
-			Minecraft::JSONAPI::Response.new(response.body)
+			MinecraftServer::JSONAPI::Response.new(response.body)
 		end
 
 		# Wrap arguments in an array if they're not already an array or hash
