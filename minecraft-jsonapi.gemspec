@@ -5,7 +5,7 @@ require 'minecraft-jsonapi/version'
 
 Gem::Specification.new do |gem|
 	gem.name          = "minecraft-jsonapi"
-	gem.version       = Minecraft::JSONAPI::VERSION
+	gem.version       = MinecraftServer::JSONAPI::VERSION
 	gem.authors       = ["Steven Hoffman"]
 	gem.email         = ["git@fustrate.com"]
 	gem.description   = "A simple Ruby gem to interact with a Minecraft server running the JSONAPI mod"
